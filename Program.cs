@@ -1,7 +1,17 @@
+using Microsoft.EntityFrameworkCore;
+using MoviesRental.Data;
+using MoviesRental.IRepository;
+using MoviesRental.Repository;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 
 var app = builder.Build();
 

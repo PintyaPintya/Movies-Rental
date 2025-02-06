@@ -1,0 +1,75 @@
+﻿@model List<Movie>
+
+@{
+    ViewData["Title"] = "Movies";
+}
+
+<a href="@Url.Action("Add")" class="btn btn-primary">Add Movie</a>
+
+@if (Model.Count > 0)
+{
+    <table id="movies" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Genre</th>
+                <th>Release Date</th>
+                <th>Date Added</th>
+                <th>Stock</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var movie in Model)
+            {
+                <tr>
+                    <td>@movie.Id</td>
+                    <td>@movie.Name</td>
+                    <td>@movie.Genre</td>
+                    <td>@movie.ReleaseDate</td>
+                    <td>@movie.DateAdded.ToShortDateString()</td>
+                    <td>@movie.Stock</td>
+                    <td>
+                        <a href="@Url.Action("Update", new{id = movie.Id})" class="btn btn-sm btn-secondary">Edit</a>
+                        <button data-movie-id="@movie.Id" class="btn btn-sm btn-danger js-delete">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No movies found</p>
+}
+
+@section scripts
+{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/6.0.0/bootbox.min.js" integrity="sha512-oVbWSv2O4y1UzvExJMHaHcaib4wsBMS5tEP3/YkMP6GmkwRJAa79Jwsv+Y/w7w2Vb/98/Xhvck10LyJweB8Jsw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.2.1/css/dataTables.dataTables.min.css">
+    <script type="text/javascript" src="https://cdn.datatables.net/2.2.1/js/dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+            var table = $("#movies").DataTable();
+
+            $("#movies").on("click", ".js-delete", function(){
+                var movieId = $(this).data("movie-id");
+                var button = $(this);
+
+                bootbox.confirm("Are you sure you want to delete this movie?", function(result){
+                    if(result && movieId){
+                        $.ajax({
+                            url: "/movie/delete/" + movieId,
+                            method: "DELETE",
+                            success: function(){
+                                table.row(button.closest("tr")).remove().draw();
+                            }
+                        })
+                    }
+                })
+            })
+        })
+    </script>
+}
