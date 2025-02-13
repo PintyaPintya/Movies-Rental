@@ -8,10 +8,12 @@ namespace MoviesRental.Repository;
 public class MovieRepository : IMovieRepository
 {
     private readonly ApplicationDbContext _context;
+    private readonly IUserRepository _userRepository;
 
-    public MovieRepository(ApplicationDbContext context)
+    public MovieRepository(ApplicationDbContext context, IUserRepository userRepository)
     {
         _context = context;
+        _userRepository = userRepository;
     }
 
     public async Task<List<Movie>> GetAll()
@@ -82,6 +84,49 @@ public class MovieRepository : IMovieRepository
         {
             _context.Movies.Remove(movie);
             await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error: {ex.Message}");
+        }
+    }
+
+    public async Task<bool> Rent(int movieId, int userId)
+    {
+        try
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var user = await _userRepository.GetById(userId);
+                if (user == null) return false;
+
+                var movie = await GetById(movieId);
+                if (movie == null) return false;
+
+                var userMovie = new UserMovie()
+                {
+                    MovieId = movieId,
+                    UserId = user.Id
+                };
+                user.Movies.Add(userMovie);
+                _context.Users.Update(user);
+
+                await _context.UserMovies.AddAsync(userMovie);
+
+                movie.Stock -= 1;
+                _context.Movies.Update(movie);
+
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception($"Error: {ex.Message}");
+            }
         }
         catch (Exception ex)
         {

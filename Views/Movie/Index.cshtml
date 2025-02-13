@@ -31,6 +31,7 @@
                     <td>@movie.DateAdded.ToShortDateString()</td>
                     <td>@movie.Stock</td>
                     <td>
+                        <a href="@Url.Action("Rent", new{id = movie.Id})" class="btn btn-sm btn-primary">Rent</a>
                         <a href="@Url.Action("Update", new{id = movie.Id})" class="btn btn-sm btn-secondary">Edit</a>
                         <button data-movie-id="@movie.Id" class="btn btn-sm btn-danger js-delete">Delete</button>
                     </td>

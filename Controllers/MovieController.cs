@@ -123,4 +123,21 @@ public class MovieController : Controller
             return View("Error");
         }
     }
+
+    [HttpPost]
+    public async Task<IActionResult> Rent(int movieId, int userId)
+    {
+        try
+        {
+            bool isSuccess = await _movieRepository.Rent(movieId, userId);
+
+            return RedirectToAction("Index");
+            
+        }
+        catch (Exception ex)
+        {
+            ViewBag.Error = ex.Message;
+            return View("Error");
+        }
+    }
 }

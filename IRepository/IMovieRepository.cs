@@ -10,4 +10,5 @@ public interface IMovieRepository
     Task<Movie?> GetById(int id);
     Task Update(Movie movie);
     Task Delete(Movie movie);
+    Task<bool> Rent(int movieId, int userId);
 }
