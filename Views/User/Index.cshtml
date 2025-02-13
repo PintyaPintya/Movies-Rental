@@ -1,0 +1,71 @@
+﻿@model List<User>
+
+@{
+	ViewData["Title"] = "Users";
+}
+
+<a href="@Url.Action("Add")" class="btn btn-primary">Add User</a>
+
+@if (Model.Count > 0)
+{
+    <table id="users" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Email Address</th>
+                <th>Birth Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@user.Name</td>
+                    <td>@user.EmailAddress</td>
+                    <td>@user.BirthDate</td>
+                    <td>
+                        <a href="@Url.Action("Update", new{id = user.Id})" class="btn btn-sm btn-secondary">Edit</a>
+                        <button data-user-id="@user.Id" class="btn btn-sm btn-danger js-delete">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No users found</p>
+}
+
+@section scripts
+{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/6.0.0/bootbox.min.js" integrity="sha512-oVbWSv2O4y1UzvExJMHaHcaib4wsBMS5tEP3/YkMP6GmkwRJAa79Jwsv+Y/w7w2Vb/98/Xhvck10LyJweB8Jsw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.2.1/css/dataTables.dataTables.min.css">
+    <script type="text/javascript" src="https://cdn.datatables.net/2.2.1/js/dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+            var table = $("#users").DataTable();
+
+            $("#users").on("click", ".js-delete", function(){
+                var movieId = $(this).data("user-id");
+                var button = $(this);
+
+                bootbox.confirm("Are you sure you want to delete this user?", function(result){
+                    if(result && movieId){
+                        $.ajax({
+                            url: "/user/delete/" + movieId,
+                            method: "DELETE",
+                            success: function(){
+                                table.row(button.closest("tr")).remove().draw();
+                            }
+                        })
+                    }
+                })
+            })
+        })
+    </script>
+}
