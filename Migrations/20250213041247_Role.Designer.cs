@@ -12,8 +12,8 @@ using MoviesRental.Data;
 namespace MoviesRental.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250206044255_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250213041247_Role")]
+    partial class Role
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,27 +24,6 @@ namespace MoviesRental.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("MoviesRental.Models.Dto.MovieDto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("MovieDto");
-                });
 
             modelBuilder.Entity("MoviesRental.Models.Movie", b =>
                 {
@@ -150,16 +129,55 @@ namespace MoviesRental.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.PrimitiveCollection<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("MoviesRental.Models.Dto.MovieDto", b =>
+            modelBuilder.Entity("MoviesRental.Models.UserMovie", b =>
                 {
-                    b.HasOne("MoviesRental.Models.User", null)
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MovieId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserMovies");
+                });
+
+            modelBuilder.Entity("MoviesRental.Models.UserMovie", b =>
+                {
+                    b.HasOne("MoviesRental.Models.Movie", "Movie")
+                        .WithMany()
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MoviesRental.Models.User", "user")
                         .WithMany("Movies")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Movie");
+
+                    b.Navigation("user");
                 });
 
             modelBuilder.Entity("MoviesRental.Models.User", b =>

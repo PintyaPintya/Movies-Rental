@@ -1,5 +1,4 @@
-﻿using MoviesRental.Models.Dto;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace MoviesRental.Models;
 
@@ -22,6 +21,8 @@ public class User
     [Display(Name = "Date of Birth")]
     public DateOnly? BirthDate { get; set; }
 
-    public List<MovieDto> Movies { get; set; } = new List<MovieDto>();
+    public List<string> Role { get; set; } = ["User"];
+
+    public List<UserMovie> Movies { get; set; } = new List<UserMovie>();
 }
 
